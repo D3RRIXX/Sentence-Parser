@@ -2,54 +2,41 @@
 {
 	public abstract class Token
 	{
-		public abstract bool Evaluate();
 	}
 
 	public class OrToken : Token
 	{
-		private readonly Token _left;
-		private readonly Token _right;
-
-		public OrToken(Token left, Token right)
+		public OrToken()
 		{
-			_left = left;
-			_right = right;
 		}
-
-		public override bool Evaluate() => _left.Evaluate() || _right.Evaluate();
+		
+		public bool Evaluate(bool left, bool right) => left || right;
+		public override string ToString() => "|";
 	}
 	
 	public class NotToken : Token
 	{
-		private readonly Token _inner;
-
-		public NotToken(Token inner)
-		{
-			_inner = inner;
-		}
-		
-		public override bool Evaluate() => !_inner.Evaluate();
+		public bool Evaluate(bool value) => value;
+		public override string ToString() => "!";
 	}
 	
 	public class OpenParenToken : Token
 	{
-		public override bool Evaluate() => true;
+		public override string ToString() => "(";
 	}
-	
-	public class CloseParenToken : Token
-	{
-		public override bool Evaluate() => false;
-	}
-	
+
 	public class ValueToken : Token
 	{
 		private readonly bool _value;
+		private readonly string _input;
 
-		public ValueToken(bool value)
+		public ValueToken(string input, bool value)
 		{
 			_value = value;
+			_input = input;
 		}
-		
-		public override bool Evaluate() => _value;
+
+		public bool Evaluate() => _value;
+		public override string ToString() => _input;
 	}
 }
