@@ -4,36 +4,30 @@ using System.Text.RegularExpressions;
 
 public static class SentenceParserUtils
 {
-	public static string ParseSentence(string inputSentence, IEnumerable<ParsingCode> parsingCodes)
+	public static bool ParseSentence(string inputSentence, IEnumerable<ParsingCode> parsingCodes)
 	{
-		foreach (var parsingCode in parsingCodes.OrderByDescending(x => x.Priority))
-		{
-			Match match = EvaluateParsingCode(inputSentence, parsingCode.Code);
-			return match.Value;
-		}
-
-		return null;
+		return parsingCodes.OrderByDescending(x => x.Priority).Any(parsingCode => EvaluateParsingCode(inputSentence, parsingCode.Code));
 	}
 
-	private static Match EvaluateParsingCode(string sentence, string code)
+	private static bool EvaluateParsingCode(string sentence, string code)
 	{
-		string pattern = ConvertToRegex(code);
-		return Regex.Match(sentence, pattern);
+		var isMatch = code.Split(' ').Select(ConvertToRegex).All(pattern => Regex.IsMatch(sentence, pattern));
+		return isMatch;
 	}
 
-	private static string ConvertToRegex(string parsingCode)
+	public static string ConvertToRegex(string parsingCode)
 	{
 		string regex = parsingCode;
 
-		regex = regex.Replace(" ", @"\s*");
-		regex = Regex.Replace(regex, @"&(\w+)", @"(?=.*\b$1\b)");
-		regex = Regex.Replace(regex, @"\[(\w+)\]", @"$1?");
-		regex = Regex.Replace(regex, @"\(([^)]+)\)", m =>
-		{
-			string[] options = m.Groups[1].Value.Split('/');
-			return "(" + string.Join("|", options) + ")";
-		});
-		regex = Regex.Replace(regex, @"!(\w+)", @"(?!.*\b$1\b)");
+		regex = Regex.Replace(regex, @"(\w+)\[(.)*\]", @"$1(?:$2)?");
+		regex = Regex.Replace(regex, @"&(\w+)", @"(\b$1\b)");
+		// regex = Regex.Replace(regex, @"\\\[(\w+)\]", @"$1?s?");
+		// regex = Regex.Replace(regex, @"\(([^)]+)\)", m =>
+		// {
+		// 	string[] options = m.Groups[1].Value.Split('/');
+		// 	return "(" + string.Join("|", options) + ")";
+		// });
+		// regex = Regex.Replace(regex, @"!(\w+)", @"(?!.*\b$1\b)");
 
 		return regex;
 	}

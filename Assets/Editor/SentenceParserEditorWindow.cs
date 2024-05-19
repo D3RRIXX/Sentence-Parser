@@ -73,8 +73,10 @@ public class SentenceParserEditorWindow : EditorWindow
 				return;
 			}
 
-			string parseResults = SentenceParserUtils.ParseSentence(_inputSentence, _parsingCodes);
-			EditorUtility.DisplayDialog("Parsing Results", string.IsNullOrEmpty(parseResults) ? "No results found." : parseResults, "OK");
+			bool parseResults = SentenceParserUtils.ParseSentence(_inputSentence, _parsingCodes);
+			string log = parseResults ? "Result found" : "No matches found";
+			Debug.Log(log);
+			// EditorUtility.DisplayDialog("Parsing Results", log, "OK");
 		}
 	}
 }
