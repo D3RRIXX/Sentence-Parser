@@ -4,9 +4,19 @@ using System.Text.RegularExpressions;
 
 public static class SentenceParserUtils
 {
-	public static bool ParseSentence(string inputSentence, IEnumerable<ParsingCode> parsingCodes)
+	public static bool ParseSentence(string inputSentence, IEnumerable<ParsingCode> parsingCodes, out string resultingCode)
 	{
-		return parsingCodes.OrderByDescending(x => x.Priority).Any(parsingCode => EvaluateParsingCode(inputSentence, parsingCode.Code));
+		foreach (ParsingCode parsingCode in parsingCodes.OrderByDescending(x => x.Priority))
+		{
+			if (EvaluateParsingCode(inputSentence, parsingCode.Code))
+			{
+				resultingCode = parsingCode.Code;
+				return true;
+			}
+		}
+
+		resultingCode = null;
+		return false;
 	}
 
 	private static bool EvaluateParsingCode(string sentence, string code)

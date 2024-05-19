@@ -14,14 +14,15 @@ namespace Tests.EditMode
 		[TestCase("&I")]
 		public void Test_And_Sign_Matches(string code)
 		{
-			Assert.IsTrue(SentenceParserUtils.ParseSentence(INPUT_SENTENCE, new[] { new ParsingCode(code) }));
+			Assert.IsTrue(SentenceParserUtils.ParseSentence(INPUT_SENTENCE, new[] { new ParsingCode(code) }, out _));
 		}
 
 		[TestCase("&banana[s]")]
 		[TestCase("&prefer[s]")]
+		[TestCase("&like[ness]")]
 		public void Test_Matches_Optional_Chars(string code)
 		{
-			Assert.IsTrue(SentenceParserUtils.ParseSentence(INPUT_SENTENCE, new[] { new ParsingCode(code) }));
+			Assert.IsTrue(SentenceParserUtils.ParseSentence(INPUT_SENTENCE, new[] { new ParsingCode(code) }, out _));
 		}
 		
 	}

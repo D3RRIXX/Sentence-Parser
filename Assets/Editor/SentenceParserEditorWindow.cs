@@ -73,8 +73,8 @@ public class SentenceParserEditorWindow : EditorWindow
 				return;
 			}
 
-			bool parseResults = SentenceParserUtils.ParseSentence(_inputSentence, _parsingCodes);
-			string log = parseResults ? "Result found" : "No matches found";
+			bool parseResults = SentenceParserUtils.ParseSentence(_inputSentence, _parsingCodes, out string resultingCode);
+			string log = parseResults ? $"Match found for code \"{resultingCode}\"" : "No matches found";
 			Debug.Log(log);
 			// EditorUtility.DisplayDialog("Parsing Results", log, "OK");
 		}
