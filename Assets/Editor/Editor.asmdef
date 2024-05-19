@@ -1,3 +1,6 @@
 {
-	"name": "Editor"
+	"name": "Editor",
+	"references": [
+		"Runtime"
+	]
 }
