@@ -58,15 +58,9 @@ public static class SentenceParserUtils
 			_ => throw new ArgumentOutOfRangeException()
 		};
 
+		regex = regex.Replace('/', '|');
 		regex = Regex.Replace(regex, @"(\w+)\[(.*)\]", @"$1(?:$2)?");
 		regex = Regex.Replace(regex, @"[&!]([^&].*)", @"(\b$1\b)");
-		// regex = Regex.Replace(regex, @"\\\[(\w+)\]", @"$1?s?");
-		// regex = Regex.Replace(regex, @"\(([^)]+)\)", m =>
-		// {
-		// 	string[] options = m.Groups[1].Value.Split('/');
-		// 	return "(" + string.Join("|", options) + ")";
-		// });
-		// regex = Regex.Replace(regex, @"!(\w+)", @"(?!.*\b$1\b)");
 
 		return (pattern: regex, shouldMatch);
 	}

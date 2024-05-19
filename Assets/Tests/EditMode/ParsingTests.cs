@@ -24,6 +24,11 @@ namespace Tests.EditMode
 		{
 			Assert.IsTrue(SentenceParserUtils.ParseSentence(INPUT_SENTENCE, new[] { new ParsingCode(code) }, out _));
 		}
-		
+
+		[TestCase("&strawberr[y/ies]")]
+		public void Test_Matches_Optional_Chars_Multiple(string code)
+		{
+			Assert.IsTrue(SentenceParserUtils.ParseSentence(INPUT_SENTENCE, new[] { new ParsingCode(code) }, out _));
+		}
 	}
 }
