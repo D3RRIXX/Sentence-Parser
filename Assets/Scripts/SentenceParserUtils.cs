@@ -11,6 +11,9 @@ public static class SentenceParserUtils
 	{
 		foreach (ParsingCode parsingCode in parsingCodes.OrderByDescending(x => x.Priority))
 		{
+			if (string.IsNullOrEmpty(parsingCode.Code))
+				continue;
+			
 			if (EvaluateParsingCode(inputSentence, parsingCode.Code))
 			{
 				resultingCode = parsingCode.Code;
@@ -24,16 +27,47 @@ public static class SentenceParserUtils
 
 	private static bool EvaluateParsingCode(string sentence, string code)
 	{
-		var tokens = ConvertWriting(sentence, code);
-		Debug.Log($"Converted writing: {string.Join('\0',tokens.Select(x => x.ToString()))}");
+		var postfix = ConvertWriting(sentence, code);
+		var list = new List<Token>(postfix);
+		Debug.Log($"Converted writing: {string.Join(", ", list.Select(x => x.ToString()))}");
 		bool output = false;
 		
-		while (tokens.Count > 0)
+		// while (postfix.Count > 0)
+		// {
+		// 	output |= ProcessToken(postfix.Pop(), postfix);
+		// }
+		//
+		// return output;
+		
+		var stack = new Stack<Token>();
+
+		foreach (var token in postfix)
 		{
-			output |= ProcessToken(tokens.Pop(), tokens);
+			switch (token)
+			{
+				case ValueToken:
+					stack.Push(token);
+					break;
+				case NotToken notToken:
+				{
+					Token operand = stack.Pop();
+					notToken.Inner = operand;
+					stack.Push(notToken);
+					break;
+				}
+				case OrToken orToken:
+				{
+					Token right = stack.Pop();
+					Token left = stack.Pop();
+					orToken.Left = left;
+					orToken.Right = right;
+					stack.Push(orToken);
+					break;
+				}
+			}
 		}
 
-		return output;
+		return stack.Pop().Evaluate();
 	}
 
 	private static bool ProcessToken(Token token, Stack<Token> tokens)
@@ -100,7 +134,7 @@ public static class SentenceParserUtils
 				}
 				case "!":
 				{
-					tokens.Push(new NotToken());
+					operatorTokens.Push(new NotToken());
 					break;
 				}
 				default:

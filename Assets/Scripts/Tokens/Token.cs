@@ -6,17 +6,13 @@
 
 	public class OrToken : Token
 	{
-		public OrToken()
-		{
-		}
-		
 		public bool Evaluate(bool left, bool right) => left || right;
 		public override string ToString() => "|";
 	}
 	
 	public class NotToken : Token
 	{
-		public bool Evaluate(bool value) => value;
+		public bool Evaluate(bool value) => !value;
 		public override string ToString() => "!";
 	}
 	
