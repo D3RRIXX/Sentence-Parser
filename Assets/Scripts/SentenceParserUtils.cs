@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 public static class SentenceParserUtils
 {
@@ -22,14 +23,35 @@ public static class SentenceParserUtils
 
 	private static bool EvaluateParsingCode(string sentence, string code)
 	{
+		// Find all groups in code
+		// Evaluate their internals
+		// Process their sign
+		// Do the rest normally
+
+		const string parseGroupsPattern = @"!?\(([^)]+)\)";
+		MatchCollection groups = Regex.Matches(code, parseGroupsPattern);
+		foreach (Match group in groups)
+		{
+			bool shouldMatch = group.Value[0] is not '!';
+			string capture = group.Groups[1].Value;
+
+			if (AllOperatorsMatch(sentence, capture) != shouldMatch)
+				return false;
+		}
+
+		return AllOperatorsMatch(sentence, code);
+	}
+
+	private static bool AllOperatorsMatch(string sentence, string code)
+	{
 		var isMatch = code.Split(' ').Select(ConvertToRegex).All(tuple => Regex.IsMatch(sentence, tuple.pattern) == tuple.shouldMatch);
 		return isMatch;
 	}
 
-	public static (string pattern, bool shouldMatch) ConvertToRegex(string parsingCode)
+	public static (string pattern, bool shouldMatch) ConvertToRegex(string parseOperator)
 	{
-		string regex = parsingCode;
-		bool shouldMatch = parsingCode[0] switch
+		string regex = parseOperator;
+		bool shouldMatch = parseOperator[0] switch
 		{
 			'&' => true,
 			'!' => false,
