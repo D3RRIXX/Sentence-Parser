@@ -19,8 +19,8 @@ public static class SentenceParserUtils
 	{
 		string regex = parsingCode;
 
-		regex = Regex.Replace(regex, @"(\w+)\[(.)*\]", @"$1(?:$2)?");
-		regex = Regex.Replace(regex, @"&(\w+)", @"(\b$1\b)");
+		regex = Regex.Replace(regex, @"(\w+)\[(.*)\]", @"$1(?:$2)?");
+		regex = Regex.Replace(regex, @"&([^&].*)", @"(\b$1\b)");
 		// regex = Regex.Replace(regex, @"\\\[(\w+)\]", @"$1?s?");
 		// regex = Regex.Replace(regex, @"\(([^)]+)\)", m =>
 		// {
