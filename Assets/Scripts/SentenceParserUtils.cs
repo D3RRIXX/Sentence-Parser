@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Tokens;
@@ -28,20 +27,17 @@ public static class SentenceParserUtils
 	private static bool EvaluateParsingCode(string sentence, string code)
 	{
 		var postfix = ConvertWriting(sentence, code);
+		return EvaluatePostfixWriting(postfix);
+	}
+
+	public static bool EvaluatePostfixWriting(IEnumerable<Token> postfix)
+	{
 		var list = new List<Token>(postfix);
 		Debug.Log($"Converted writing: {string.Join(", ", list.Select(x => x.ToString()))}");
-		bool output = false;
-		
-		// while (postfix.Count > 0)
-		// {
-		// 	output |= ProcessToken(postfix.Pop(), postfix);
-		// }
-		//
-		// return output;
 		
 		var stack = new Stack<Token>();
 
-		foreach (var token in postfix)
+		foreach (var token in list)
 		{
 			switch (token)
 			{
@@ -70,35 +66,11 @@ public static class SentenceParserUtils
 		return stack.Pop().Evaluate();
 	}
 
-	private static bool ProcessToken(Token token, Stack<Token> tokens)
+	private static List<Token> ConvertWriting(string sentence, string code)
 	{
-		switch (token)
-		{
-			case NotToken notToken:
-				return notToken.Evaluate(ProcessToken(tokens.Pop(), tokens));
-			case OrToken orToken:
-			{
-				bool right = ProcessToken(tokens.Pop(), tokens);
-				bool left = ProcessToken(tokens.Pop(), tokens);
-				return orToken.Evaluate(left, right);
-			}
-			case ValueToken valueToken:
-				return valueToken.Evaluate();
-			default:
-				throw new ArgumentOutOfRangeException(nameof(token));
-		}
-	}
-
-	private static Stack<Token> ConvertWriting(string sentence, string code)
-	{
-		// Find all groups in code
-		// Evaluate their internals
-		// Process their sign
-		// Do the rest normally
-
 		const string tokenPattern = @"&?([()!|]{1}|[\w\[\]\/]+)";
-		Stack<Token> tokens = new();
-		Stack<Token> operatorTokens = new();
+		List<Token> tokens = new();
+		Stack<OperatorToken> operators = new();
 
 		int i = 0;
 		foreach (Match match in Regex.Matches(code, tokenPattern))
@@ -109,46 +81,55 @@ public static class SentenceParserUtils
 			{
 				case "(":
 				{
-					operatorTokens.Push(new OpenParenToken());
+					operators.Push(new OpenParenToken());
 					break;
 				}
 				case ")":
 				{
-					while (operatorTokens.Count > 0 && operatorTokens.Peek() is not OpenParenToken)
+					while (operators.Count > 0 && operators.Peek() is not OpenParenToken)
 					{
-						tokens.Push(operatorTokens.Pop());
+						tokens.Add(operators.Pop());
 					}
 
-					operatorTokens.Pop();
+					operators.Pop();
 					break;
 				}
 				case "|":
 				{
-					while (operatorTokens.Count > 0 && operatorTokens.Peek() is OrToken)
+					var orToken = new OrToken();
+					while (operators.TryPeek(out OperatorToken token) && token is not OpenParenToken && orToken.Precedence <= token.Precedence)
 					{
-						tokens.Push(operatorTokens.Pop());
+						tokens.Add(operators.Pop());
 					}
-					
-					operatorTokens.Push(new OrToken());
+
+					operators.Push(orToken);
 					break;
 				}
 				case "!":
 				{
-					operatorTokens.Push(new NotToken());
+					var notToken = new NotToken();
+					while (operators.TryPeek(out OperatorToken token) && token is not OpenParenToken && notToken.Precedence <= token.Precedence)
+					{
+						tokens.Add(operators.Pop());
+					}
+					operators.Push(notToken);
 					break;
 				}
 				default:
 				{
 					string pattern = ConvertToRegex(matchValue);
-					tokens.Push(new ValueToken(matchValue, Regex.IsMatch(sentence, pattern)));
+					tokens.Add(new ValueToken(matchValue, Regex.IsMatch(sentence, pattern)));
+					if (operators.TryPeek(out OperatorToken operatorToken) && operatorToken is NotToken)
+						tokens.Add(operators.Pop());
+						
 					break;
 				}
 			}
 		}
 		
-		while (operatorTokens.Count > 0)
+		while (operators.Count > 0)
 		{
-			tokens.Push(operatorTokens.Pop());
+			tokens.Add(operators.Pop());
 		}
 
 		return tokens;

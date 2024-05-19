@@ -1,5 +1,7 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using NUnit.Framework;
+using Tokens;
 using UnityEngine.TestTools;
 
 namespace Tests.EditMode
@@ -29,6 +31,13 @@ namespace Tests.EditMode
 		public void Test_Matches_Optional_Chars_Multiple(string code)
 		{
 			Assert.IsTrue(SentenceParserUtils.ParseSentence(INPUT_SENTENCE, new[] { new ParsingCode(code) }, out _));
+		}
+
+		[Test]
+		public void Test_Postfix_Evaluation_Works_Correctly()
+		{
+			bool evaluation = SentenceParserUtils.EvaluatePostfixWriting(new Stack<Token>(new Token[] { new NotToken(), new ValueToken("pear", false) }));
+			Assert.IsTrue(evaluation);
 		}
 	}
 }

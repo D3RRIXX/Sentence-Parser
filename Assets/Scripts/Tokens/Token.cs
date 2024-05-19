@@ -2,23 +2,36 @@
 {
 	public abstract class Token
 	{
+		public abstract bool Evaluate();
 	}
 
-	public class OrToken : Token
+	public abstract class OperatorToken : Token
 	{
-		public bool Evaluate(bool left, bool right) => left || right;
+		public abstract int Precedence { get; }
+	}
+
+	public class OrToken : OperatorToken
+	{
+		public override int Precedence => 1;
+		public Token Left { get; set; }
+		public Token Right { get; set; }
 		public override string ToString() => "|";
+		public override bool Evaluate() => Left.Evaluate() || Right.Evaluate();
 	}
 	
-	public class NotToken : Token
+	public class NotToken : OperatorToken
 	{
-		public bool Evaluate(bool value) => !value;
+		public Token Inner { get; set; }
+		public override int Precedence => 2;
+		public override bool Evaluate() => !Inner.Evaluate();
 		public override string ToString() => "!";
 	}
 	
-	public class OpenParenToken : Token
+	public class OpenParenToken : OperatorToken
 	{
+		public override int Precedence => 0;
 		public override string ToString() => "(";
+		public override bool Evaluate() => true;
 	}
 
 	public class ValueToken : Token
@@ -32,7 +45,7 @@
 			_input = input;
 		}
 
-		public bool Evaluate() => _value;
+		public override bool Evaluate() => _value;
 		public override string ToString() => _input;
 	}
 }
