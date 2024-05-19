@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 
 namespace Tests.EditMode
 {
@@ -8,13 +9,21 @@ namespace Tests.EditMode
 		[TestCase("&like", @"(\blike\b)")]
 		public void Test_Ampersand(string code, string regex)
 		{
-			Assert.IsTrue(SentenceParserUtils.ConvertToRegex(code) == regex);
+			(string pattern, bool _) = SentenceParserUtils.ConvertToRegex(code);
+			Assert.AreEqual(regex, pattern);
 		}
 
 		[TestCase("&like[ness]", @"(\blike(?:ness)?\b)")]
 		public void Test_Optional(string code, string regex)
 		{
-			Assert.AreEqual(regex, SentenceParserUtils.ConvertToRegex(code));
+			(string pattern, bool _) = SentenceParserUtils.ConvertToRegex(code);
+			Assert.AreEqual(regex, pattern);
+		}
+
+		[Test]
+		public void Test_Should_Throw_On_Invalid_Input()
+		{
+			Assert.Throws<ArgumentOutOfRangeException>(() => SentenceParserUtils.ConvertToRegex("no-sign"));
 		}
 	}
 }

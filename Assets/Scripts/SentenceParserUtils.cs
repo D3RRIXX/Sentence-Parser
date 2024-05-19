@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -21,16 +22,22 @@ public static class SentenceParserUtils
 
 	private static bool EvaluateParsingCode(string sentence, string code)
 	{
-		var isMatch = code.Split(' ').Select(ConvertToRegex).All(pattern => Regex.IsMatch(sentence, pattern));
+		var isMatch = code.Split(' ').Select(ConvertToRegex).All(tuple => Regex.IsMatch(sentence, tuple.pattern) == tuple.shouldMatch);
 		return isMatch;
 	}
 
-	public static string ConvertToRegex(string parsingCode)
+	public static (string pattern, bool shouldMatch) ConvertToRegex(string parsingCode)
 	{
 		string regex = parsingCode;
+		bool shouldMatch = parsingCode[0] switch
+		{
+			'&' => true,
+			'!' => false,
+			_ => throw new ArgumentOutOfRangeException()
+		};
 
 		regex = Regex.Replace(regex, @"(\w+)\[(.*)\]", @"$1(?:$2)?");
-		regex = Regex.Replace(regex, @"&([^&].*)", @"(\b$1\b)");
+		regex = Regex.Replace(regex, @"[&!]([^&].*)", @"(\b$1\b)");
 		// regex = Regex.Replace(regex, @"\\\[(\w+)\]", @"$1?s?");
 		// regex = Regex.Replace(regex, @"\(([^)]+)\)", m =>
 		// {
@@ -39,6 +46,6 @@ public static class SentenceParserUtils
 		// });
 		// regex = Regex.Replace(regex, @"!(\w+)", @"(?!.*\b$1\b)");
 
-		return regex;
+		return (pattern: regex, shouldMatch);
 	}
 }
