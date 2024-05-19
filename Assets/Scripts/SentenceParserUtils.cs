@@ -63,7 +63,13 @@ public static class SentenceParserUtils
 			}
 		}
 
-		return stack.Pop().Evaluate();
+		bool output = true;
+		while (stack.TryPop(out Token token))
+		{
+			bool b = token.Evaluate();
+			output &= b;
+		}
+		return output;
 	}
 
 	private static List<Token> ConvertWriting(string sentence, string code)
