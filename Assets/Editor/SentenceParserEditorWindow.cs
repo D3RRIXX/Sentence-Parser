@@ -1,17 +1,22 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEditorInternal;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class SentenceParserEditorWindow : EditorWindow
 {
+	private const string STYLE_ERROR_FIELD = "error-field";
+	
+	[SerializeField] private VisualTreeAsset _editorUxml;
+	[SerializeField] private VisualTreeAsset _parsingCodeItemUxml;
+
+	private readonly List<ParsingCode> _parsingCodes = new();
 	private string _inputSentence;
-	private List<ParsingCode> _parsingCodes = new();
 	private ReorderableList _list;
 	private bool _inputEmpty;
+	private TextField _textField;
 
 	[MenuItem("Tools/Sentence Parser", priority = -100)]
 	private static void GetWindow()
@@ -19,64 +24,50 @@ public class SentenceParserEditorWindow : EditorWindow
 		GetWindow<SentenceParserEditorWindow>("Sentence Parser");
 	}
 
-	private void OnEnable()
+	private void CreateGUI()
 	{
-		_list = new ReorderableList(_parsingCodes, typeof(ParsingCode))
+		_editorUxml.CloneTree(rootVisualElement);
+
+		_textField = rootVisualElement.Q<TextField>("input-sentence");
+		_textField.value = _inputSentence;
+		_textField.RegisterValueChangedCallback(evt =>
 		{
-			drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Parsing Codes"),
-			drawElementCallback = DrawElement,
-			elementHeight = EditorGUIUtility.singleLineHeight * 2 + EditorGUIUtility.standardVerticalSpacing,
-		};
-	}
+			_inputSentence = evt.newValue;
+			_textField.RemoveFromClassList(STYLE_ERROR_FIELD);
+		});
 
-	private void DrawElement(Rect rect, int index, bool isActive, bool isFocused)
-	{
-		const int fieldSpacing = 5;
-		float singleLineHeight = EditorGUIUtility.singleLineHeight;
-
-		ParsingCode parsingCode = _parsingCodes[index];
-		rect.y += 2;
-
-		var prefixLabel = new GUIContent("Code");
-		EditorGUI.PrefixLabel(rect, prefixLabel);
-		Vector2 size = GUI.skin.label.CalcSize(prefixLabel);
-
-		// rect.x += size.x + fieldSpacing;
-
-		GUIStyle style = GUI.skin.textField;
-		
-		parsingCode.Code = EditorGUI.TextField(new Rect(rect.x + size.x + fieldSpacing, rect.y, rect.width - size.x - fieldSpacing, singleLineHeight), parsingCode.Code, style);
-		parsingCode.Priority = EditorGUI.IntField(new Rect(rect.x, rect.y + EditorGUIUtility.standardVerticalSpacing + singleLineHeight, rect.width, singleLineHeight), "Priority", parsingCode.Priority);
-	}
-
-	private void OnGUI()
-	{
-		var style = GUI.skin.textArea;
-		style.wordWrap = true;
-
-		EditorGUILayout.PrefixLabel("Input Sentence");
-		
-		_inputSentence = EditorGUILayout.TextArea(_inputSentence, style);
-
-		EditorGUILayout.Space(10);
-
-		_list.DoLayoutList();
-		
-		EditorGUILayout.Space(10);
-
-		if (GUILayout.Button("Parse Sentence", GUILayout.Height(30)))
+		var listView = rootVisualElement.Q<ListView>();
+		listView.itemsSource = _parsingCodes;
+		listView.makeItem = _parsingCodeItemUxml.CloneTree;
+		listView.bindItem = BindItem;
+		listView.itemsAdded += ints =>
 		{
-			if (string.IsNullOrEmpty(_inputSentence))
+			foreach (int i in ints)
 			{
-				_inputEmpty = true;
-				Debug.LogError("Input sentence is empty!");
-				return;
+				_parsingCodes[i] = new ParsingCode();
 			}
+		};
 
-			bool parseResults = SentenceParserUtils.ParseSentence(_inputSentence, _parsingCodes, out string resultingCode);
-			string log = parseResults ? $"Match found for code \"{resultingCode}\"" : "No matches found";
-			Debug.Log(log);
-			// EditorUtility.DisplayDialog("Parsing Results", log, "OK");
+		rootVisualElement.Q<Button>("button-parse").clicked += OnParseSentence;
+	}
+
+	private void BindItem(VisualElement element, int idx)
+	{
+		element.Q<TextField>().RegisterValueChangedCallback(evt => _parsingCodes[idx].Code = evt.newValue);
+		element.Q<IntegerField>().RegisterValueChangedCallback(evt => _parsingCodes[idx].Priority = evt.newValue);
+	}
+
+	private void OnParseSentence()
+	{
+		if (string.IsNullOrEmpty(_inputSentence))
+		{
+			_textField.AddToClassList(STYLE_ERROR_FIELD);
+			Debug.LogError("Input sentence is empty!");
+			return;
 		}
+
+		bool parseResults = SentenceParserUtils.ParseSentence(_inputSentence, _parsingCodes, out string resultingCode);
+		string log = parseResults ? $"Match found for code \"{resultingCode}\"" : "No matches found";
+		Debug.Log(log);
 	}
 }
