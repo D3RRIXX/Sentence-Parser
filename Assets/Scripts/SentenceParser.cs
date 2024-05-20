@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using Tokens;
 using UnityEngine;
 
-public static class SentenceParserUtils
+public static class SentenceParser
 {
 	public static bool ParseSentence(string inputSentence, IEnumerable<ParsingCode> parsingCodes, out string resultingCode)
 	{

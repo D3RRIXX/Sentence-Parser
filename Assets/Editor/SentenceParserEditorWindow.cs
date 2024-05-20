@@ -59,7 +59,7 @@ public class SentenceParserEditorWindow : EditorWindow
 			return;
 		}
 
-		bool parseResults = SentenceParserUtils.ParseSentence(_inputSentence, _parsingCodes, out string resultingCode);
+		bool parseResults = SentenceParser.ParseSentence(_inputSentence, _parsingCodes, out string resultingCode);
 		string log = parseResults ? $"Match found for code \"{resultingCode}\"" : "No matches found";
 		Debug.Log(log);
 	}
