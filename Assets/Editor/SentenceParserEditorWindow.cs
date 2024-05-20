@@ -11,12 +11,14 @@ public class SentenceParserEditorWindow : EditorWindow
 	
 	[SerializeField] private VisualTreeAsset _editorUxml;
 	[SerializeField] private VisualTreeAsset _parsingCodeItemUxml;
+	
+	[SerializeField] private List<ParsingCode> _parsingCodes = new();
+	[SerializeField] private string _inputSentence;
 
-	private readonly List<ParsingCode> _parsingCodes = new();
-	private string _inputSentence;
 	private ReorderableList _list;
 	private bool _inputEmpty;
 	private TextField _textField;
+	private SerializedObject _serializedObject;
 
 	[MenuItem("Tools/Sentence Parser", priority = -100)]
 	private static void GetWindow()
@@ -24,37 +26,28 @@ public class SentenceParserEditorWindow : EditorWindow
 		GetWindow<SentenceParserEditorWindow>("Sentence Parser");
 	}
 
+	private void OnEnable()
+	{
+		_serializedObject = new SerializedObject(this);
+	}
+
+	private void OnDisable()
+	{
+		_serializedObject.Dispose();
+	}
+
 	private void CreateGUI()
 	{
 		_editorUxml.CloneTree(rootVisualElement);
 
 		_textField = rootVisualElement.Q<TextField>("input-sentence");
-		_textField.value = _inputSentence;
-		_textField.RegisterValueChangedCallback(evt =>
-		{
-			_inputSentence = evt.newValue;
-			_textField.RemoveFromClassList(STYLE_ERROR_FIELD);
-		});
 
 		var listView = rootVisualElement.Q<ListView>();
-		listView.itemsSource = _parsingCodes;
 		listView.makeItem = _parsingCodeItemUxml.CloneTree;
-		listView.bindItem = BindItem;
-		listView.itemsAdded += ints =>
-		{
-			foreach (int i in ints)
-			{
-				_parsingCodes[i] = new ParsingCode();
-			}
-		};
-
+		
 		rootVisualElement.Q<Button>("button-parse").clicked += OnParseSentence;
-	}
-
-	private void BindItem(VisualElement element, int idx)
-	{
-		element.Q<TextField>().RegisterValueChangedCallback(evt => _parsingCodes[idx].Code = evt.newValue);
-		element.Q<IntegerField>().RegisterValueChangedCallback(evt => _parsingCodes[idx].Priority = evt.newValue);
+		
+		rootVisualElement.Bind(_serializedObject);
 	}
 
 	private void OnParseSentence()
