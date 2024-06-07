@@ -1,11 +1,11 @@
 {
-    "name": "Tests",
+    "name": "SentenceParser.Tests.Editor",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "Editor",
-        "Runtime"
+        "SentenceParser",
+        "SentenceParser.Editor"
     ],
     "includePlatforms": [
         "Editor"

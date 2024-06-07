@@ -1,0 +1,16 @@
+{
+    "name": "SentenceParser.Editor",
+    "rootNamespace": "",
+    "references": [
+        "SentenceParser"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
