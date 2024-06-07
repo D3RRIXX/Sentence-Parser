@@ -34,7 +34,7 @@ All the codes listed above are true, meaning the conditions specified within the
 ## Getting Started
 
 ### Prerequisites
-* Unity 2020.1 or later
+* Unity 2021.1 or later
 
 ### Installation
 Install via Unity Package Manager:
