@@ -37,14 +37,10 @@ All the codes listed above are true, meaning the conditions specified within the
 * Unity 2020.1 or later
 
 ### Installation
-1. Clone the repository:
-    ```bash
-    git clone https://github.com/yourusername/unity-sentence-parser.git
-    ```
-
-2. Open the project in Unity:
-    * Open Unity Hub.
-    * Click on Add and select the cloned project folder.
+Install via Unity Package Manager:
+   1. Open UPM
+   2. Select `Add package > Add package from git URL`
+   3. Paste `https://github.com/D3RRIXX/Sentence-Parser.git?path=Packages/com.derrixx.sentence-parser`
 
 ### Usage
 1. Import the Sentence Parser Tool into your Unity project.
