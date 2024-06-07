@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SentenceParser;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEditorInternal;
@@ -59,7 +60,7 @@ public class SentenceParserEditorWindow : EditorWindow
 			return;
 		}
 
-		bool parseResults = SentenceParser.ParseSentence(_inputSentence, _parsingCodes, out string resultingCode);
+		bool parseResults = SentenceParser.SentenceParserTool.ParseSentence(_inputSentence, _parsingCodes, out string resultingCode);
 		string log = parseResults ? $"Match found for code \"{resultingCode}\"" : "No matches found";
 		Debug.Log(log);
 	}

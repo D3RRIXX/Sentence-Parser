@@ -1,4 +1,4 @@
-﻿namespace Tokens
+﻿namespace SentenceParser.Tokens
 {
 	public abstract class Token
 	{

@@ -1,6 +1,6 @@
 {
     "name": "SentenceParser.Editor",
-    "rootNamespace": "",
+    "rootNamespace": "SentenceParser",
     "references": [
         "SentenceParser"
     ],

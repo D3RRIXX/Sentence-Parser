@@ -1,6 +1,6 @@
 {
     "name": "SentenceParser",
-    "rootNamespace": "",
+    "rootNamespace": "SentenceParser",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

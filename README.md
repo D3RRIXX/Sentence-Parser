@@ -30,3 +30,61 @@ Given the following codes:
 * `!(!brown &red) &dog[s] | &fast`
 
 All the codes listed above are true, meaning the conditions specified within them are met in the given sentence.
+
+## Getting Started
+
+### Prerequisites
+* Unity 2020.1 or later
+
+### Installation
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/yourusername/unity-sentence-parser.git
+    ```
+
+2. Open the project in Unity:
+    * Open Unity Hub.
+    * Click on Add and select the cloned project folder.
+
+### Usage
+1. Import the Sentence Parser Tool into your Unity project.
+2. Use the provided API to define your parsing codes and input sentences.
+3. Execute the parser to retrieve the highest priority code whose condition is met.
+
+## Example Code
+Here’s a basic example of how to use the Sentence Parser Tool:
+
+```cs
+using SentenceParser;
+using UnityEngine;
+
+public class Example : MonoBehaviour
+{
+	void Start()
+	{
+		string sentence = "A quick brown fox jumps over a lazy dog";
+		var codes = new ParsingCode[]
+		{
+			new("&quick"),
+			new("&bro[wn/ad]"),
+			new("!red"),
+			new("!brown | !red", priority: 10),
+			new("!(!brown &red) &dog[s] | &fast"),
+		};
+
+		if (SentenceParserTool.ParseSentence(sentence, codes, out string resultingCode))
+		{
+			Debug.Log($"Found match for parsing code '{resultingCode}'");
+		}
+		else
+		{
+			Debug.LogError("No matching code found!");
+		}
+	}
+}
+```
+## Contributing
+We welcome contributions to improve the Unity Sentence Parser Tool. Please fork the repository and submit pull requests.
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
