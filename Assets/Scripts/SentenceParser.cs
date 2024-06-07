@@ -26,18 +26,15 @@ public static class SentenceParser
 
 	private static bool EvaluateParsingCode(string sentence, string code)
 	{
-		var postfix = ConvertWriting(sentence, code);
+		List<Token> postfix = ConvertWritingToPostfix(sentence, code);
 		return EvaluatePostfixWriting(postfix);
 	}
 
 	public static bool EvaluatePostfixWriting(IEnumerable<Token> postfix)
 	{
-		var list = new List<Token>(postfix);
-		Debug.Log($"Converted writing: {string.Join(", ", list.Select(x => x.ToString()))}");
-		
 		var stack = new Stack<Token>();
 
-		foreach (var token in list)
+		foreach (var token in postfix)
 		{
 			switch (token)
 			{
@@ -72,17 +69,15 @@ public static class SentenceParser
 		return output;
 	}
 
-	private static List<Token> ConvertWriting(string sentence, string code)
+	private static List<Token> ConvertWritingToPostfix(string sentence, string code)
 	{
 		const string tokenPattern = @"&?([()!|]{1}|[\w\[\]\/]+)";
 		List<Token> tokens = new();
 		Stack<OperatorToken> operators = new();
 
-		int i = 0;
 		foreach (Match match in Regex.Matches(code, tokenPattern))
 		{
 			string matchValue = match.Groups[1].Value;
-			Debug.Log($"[{i++}] {matchValue}");
 			switch (matchValue)
 			{
 				case "(":
