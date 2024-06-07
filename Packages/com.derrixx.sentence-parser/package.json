@@ -9,5 +9,6 @@
   },
   "unity": "2021.1",
   "keywords": ["sentence", "parser", "tool"],
-  "documentationUrl": "https://github.com/D3RRIXX/Sentence-Parser/blob/main/README.md"
+  "documentationUrl": "https://github.com/D3RRIXX/Sentence-Parser",
+  "licensesUrl": "https://github.com/D3RRIXX/Sentence-Parser/blob/main/LICENSE.md"
 }
