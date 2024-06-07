@@ -1,0 +1,11 @@
+{
+  "name": "com.derrixx.sentence-parser",
+  "displayName": "Sentence Parser",
+  "version": "1.0.0",
+  "author": {
+    "name": "Evghenii Zagaievschi",
+    "email": "jenyazagevskii@gmail.com",
+    "url": "https://github.com/D3RRIXX"
+  },
+  "unity": "2021.1"
+}

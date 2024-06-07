@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "com.derrixx.sentence-parser": {
+      "version": "file:com.derrixx.sentence-parser",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.unity.editorcoroutines": {
       "version": "1.0.0",
       "depth": 1,
